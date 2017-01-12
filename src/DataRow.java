@@ -2,13 +2,14 @@ import java.math.BigDecimal;
 
 public class DataRow {
 
-	public String price_date;
-	public BigDecimal open_price;
-	public BigDecimal high_price;
-	public BigDecimal low_price;
-	public BigDecimal close_price;
-	public BigDecimal volume;
-	public BigDecimal adj_close_price;
+	private String price_date;
+	private BigDecimal open_price;
+	private BigDecimal high_price;
+	private BigDecimal low_price;
+	private BigDecimal close_price;
+	private BigDecimal volume;
+	private BigDecimal adj_close_price;
+	
 	public String getPrice_date() {
 		return price_date;
 	}

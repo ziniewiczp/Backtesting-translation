@@ -3,17 +3,30 @@ import java.util.ArrayList;
 import java.sql.*;
 
 
-public class DatabaseDataHandler{
+public class DatabaseDataHandler extends DataHandler {
 
-	public int currentRow;
-	public ArrayList<DataRow> dataset;
+	private int currentRow;
+	private String[] symbols = {"AAPL", "GOOG", "PEP"};
+	private ArrayList<DataRow> AAPLDataset;
+	private ArrayList<DataRow> GOOGDataset;
+	private ArrayList<DataRow> PEPDataset;
 	
-	public void open_convert_database(){
+	public DatabaseDataHandler() {
+		open_convert_database();
+	}
+
+	/*
+	 * Initialization. Downloads data from
+	 * database and propagates arrays with it.
+	 */
+	private void open_convert_database() {
 		
 		Connection dbConnection = null;
 		Statement dbStatement = null;
 		ResultSet resultSet = null;
-		dataset = new ArrayList<DataRow>();
+		AAPLDataset = new ArrayList<DataRow>();
+		GOOGDataset = new ArrayList<DataRow>();
+		PEPDataset = new ArrayList<DataRow>();
 		currentRow = 0;
 		
 		try {
@@ -25,17 +38,40 @@ public class DatabaseDataHandler{
 					.getConnection("jdbc:mysql://localhost:3306/securities_master","root", "hieno07miau");
 
 			dbStatement = dbConnection.createStatement();
-			resultSet = dbStatement.executeQuery("SELECT dp.price_date, dp.open_price, dp.high_price, dp.low_price, dp.close_price, dp.volume, dp.adj_close_price FROM symbol AS sym INNER JOIN daily_price AS dp ON dp.symbol_id = sym.id WHERE sym.ticker = \"AAPL\" ORDER BY dp.price_date ASC;");
-			while (resultSet.next()) {
-				DataRow newRow = new DataRow();
-				newRow.adj_close_price = resultSet.getBigDecimal("adj_close_price");
-				newRow.open_price = resultSet.getBigDecimal("open_price");
-				newRow.price_date = resultSet.getString("price_date");
-				newRow.close_price = resultSet.getBigDecimal("close_price");
-				newRow.high_price = resultSet.getBigDecimal("high_price");
-				newRow.low_price = resultSet.getBigDecimal("low_price");
-				newRow.volume = resultSet.getBigDecimal("volume");
-				dataset.add(newRow);
+			
+			for( String symbol : symbols ) {
+				// getting data from database
+				resultSet = dbStatement.executeQuery("SELECT dp.price_date, dp.open_price," + 
+													 "dp.high_price, dp.low_price, dp.close_price," + 
+													 "dp.volume, dp.adj_close_price FROM symbol AS sym" + 
+													 "INNER JOIN daily_price AS dp ON dp.symbol_id = sym.id" + 
+													 "WHERE sym.ticker = \"" + symbol + "\" ORDER BY dp.price_date ASC;");
+				
+				// filling dataset ArrayList with data taken from database
+				while (resultSet.next()) {
+					DataRow newRow = new DataRow();
+					newRow.setAdj_close_price(resultSet.getBigDecimal("adj_close_price"));
+					newRow.setOpen_price(resultSet.getBigDecimal("open_price"));
+					newRow.setPrice_date(resultSet.getString("price_date"));
+					newRow.setClose_price(resultSet.getBigDecimal("close_price"));
+					newRow.setHigh_price(resultSet.getBigDecimal("high_price"));
+					newRow.setLow_price(resultSet.getBigDecimal("low_price"));
+					newRow.setVolume(resultSet.getBigDecimal("volume"));
+					
+					switch( symbol ) {
+						case "AAPL":
+							AAPLDataset.add(newRow);
+							break;
+							
+						case "GOOG":
+							GOOGDataset.add(newRow);
+							break;
+						
+						case "PEP":
+							PEPDataset.add(newRow);
+							break;
+					}
+				}
 			}
 			
 			resultSet.close();
@@ -65,34 +101,177 @@ public class DatabaseDataHandler{
 		}
 	}
 	
-	public DataRow get_new_bar(){
-		DataRow row = dataset.get(currentRow);
-		currentRow++;
+	/*
+	 * Returns the next row from database for 
+	 * specified symbol. Used by update_rows().
+	 */
+	private DataRow get_new_bar(String symbol) {
+		DataRow row = null;
+		
+		switch( symbol ) {
+			case "AAPL":
+				row = AAPLDataset.get(currentRow);
+				break;
+				
+			case "GOOG":
+				row = GOOGDataset.get(currentRow);
+				break;
+			
+			case "PEP":
+				row = PEPDataset.get(currentRow);
+				break;
+		}
+		
 		return row;
 	}
 	
-	public DataRow get_latest_bar(){
-		DataRow latest_row = dataset.get(currentRow-1);
-		return latest_row;
+	public DataRow get_latest_bar(String symbol) {
+		DataRow latestRow = null;
+		
+		switch( symbol ) {
+			case "AAPL":
+				latestRow = AAPLDataset.get(currentRow - 1);
+				break;
+				
+			case "GOOG":
+				latestRow = GOOGDataset.get(currentRow - 1);
+				break;
+			
+			case "PEP":
+				latestRow = PEPDataset.get(currentRow - 1);
+				break;
+		}
+		
+		return latestRow;
 	}
-	
-	public ArrayList<DataRow> get_latest_bars(int startIndex) {
+
+	public ArrayList<DataRow> get_latest_bars(String symbol, int N) {
 		ArrayList<DataRow> latestBars = new ArrayList<DataRow>();
-		for(int i = startIndex; i <= currentRow; i++) {
-			latestBars.add(dataset.get(i));
+		
+		switch( symbol ) {
+			case "AAPL":
+				for(int i = N; i > 0; i--) {
+					latestBars.add(AAPLDataset.get(currentRow - (i-1)));
+				}
+				break;
+				
+			case "GOOG":
+				for(int i = N; i > 0; i--) {
+					latestBars.add(GOOGDataset.get(currentRow - (i-1)));
+				}
+				break;
+			
+			case "PEP":
+				for(int i = N; i > 0; i--) {
+					latestBars.add(PEPDataset.get(currentRow - (i-1)));
+				}
+				break;
 		}
 		
 		return latestBars;
 	}
-	
-	public String get_latest_bar_datetime(){
-		String latest_bar_datetime = dataset.get(currentRow).price_date;
-		return latest_bar_datetime;
+
+	public String get_latest_bar_datetime(String symbol) {
+		String latestBarDatetime = null;
+		
+		switch( symbol ) {
+			case "AAPL":
+				latestBarDatetime = AAPLDataset.get(currentRow).getPrice_date();
+				break;
+				
+			case "GOOG":
+				latestBarDatetime = GOOGDataset.get(currentRow).getPrice_date();
+				break;
+			
+			case "PEP":
+				latestBarDatetime = PEPDataset.get(currentRow).getPrice_date();
+				break;
+		}
+		
+		return latestBarDatetime;
 	}
 	
-	public BigDecimal get_latest_bar_value(String val_type){
-		DataRow currentDataRow = dataset.get(currentRow);
-		BigDecimal latest_bar_value = currentDataRow;
+	public BigDecimal get_latest_bar_value(String symbol, String val_type) {
+		DataRow currentDataRow = get_latest_bar(symbol);
 		
+		switch( val_type ) {
+			case "adj_close_price":
+				return currentDataRow.getAdj_close_price();
+			
+			case "open price":
+				return currentDataRow.getOpen_price();
+			
+			case "close price":
+				return currentDataRow.getClose_price();
+			
+			case "high_price":
+				return currentDataRow.getHigh_price();
+			
+			case "low_price":
+				return currentDataRow.getLow_price();
+			
+			case "volume":
+				return currentDataRow.getVolume();
+				
+			default:
+				return null;
+		
+		}
+	}
+	
+	public ArrayList<BigDecimal> get_latest_bar_values(String symbol, String val_type, int N) {
+		ArrayList<DataRow> latestRows = get_latest_bars(symbol, N);
+		ArrayList<BigDecimal> latestRowsValues = new ArrayList<BigDecimal>();
+		
+		switch( val_type ) {
+			case "adj_close_price":
+				for( DataRow row : latestRows ) {
+					latestRowsValues.add(row.getAdj_close_price());
+				}
+				break;
+			
+			case "open price":
+				for( DataRow row : latestRows ) {
+					latestRowsValues.add(row.getOpen_price());
+				}
+				break;
+			
+			case "close price":
+				for( DataRow row : latestRows ) {
+					latestRowsValues.add(row.getClose_price());
+				}
+				break;
+			
+			case "high_price":
+				for( DataRow row : latestRows ) {
+					latestRowsValues.add(row.getHigh_price());
+				}
+				break;
+			
+			case "low_price":
+				for( DataRow row : latestRows ) {
+					latestRowsValues.add(row.getLow_price());
+				}
+				break;
+			
+			case "volume":
+				for( DataRow row : latestRows ) {
+					latestRowsValues.add(row.getVolume());
+				}
+				break;
+				
+			default:
+				return null;		
+		}
+		
+		return latestRowsValues;
+	}
+	
+	public void update_bars() {
+		for( String symbol : symbols ) {
+			get_new_bar(symbol);
+		}
+		
+		this.currentRow++;
 	}
 }
