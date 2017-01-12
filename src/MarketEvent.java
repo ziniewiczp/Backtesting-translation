@@ -1,6 +1,8 @@
 
 public class MarketEvent extends Event {
-	MarketEvent(){
-		String oftype = "MARKET";
+	
+	public MarketEvent() {
+		
+		this.oftype = "MARKET";
 	}
 }

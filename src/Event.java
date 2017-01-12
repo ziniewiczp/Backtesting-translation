@@ -1,4 +1,6 @@
 
-public class Event {
+public abstract class Event {
+	
+	String oftype;
 
 }
