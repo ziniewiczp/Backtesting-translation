@@ -1,12 +1,14 @@
+import java.math.BigDecimal;
 
-public class OrderEvent extends Event {
+public class OrderEvent implements Event {
 	
+	String oftype;
 	String symbol;
 	String order_type;
-	int quantity;
+	BigDecimal quantity;
 	String direction;
 	
-	public OrderEvent(String symbol, String order_type, int quantity, String direction) {
+	public OrderEvent(String symbol, String order_type, BigDecimal quantity, String direction) {
 
 		this.oftype = "ORDER";
 		this.symbol = symbol;
@@ -19,5 +21,10 @@ public class OrderEvent extends Event {
 	public void print_order() {
 		System.out.println("Order: Symbol=" + symbol + ", Type=" + order_type +
 				", Quantity=" + quantity + ", Direction=" + direction);
+	}
+	
+	@Override
+	public String getOfType() {
+		return this.oftype;
 	}
 }

@@ -1,7 +1,8 @@
 import java.math.BigDecimal;
 
-public class FillEvent extends Event {
+public class FillEvent implements Event {
 	
+	String oftype;
 	String timeindex;
 	String symbol;
 	String exchange;
@@ -53,5 +54,10 @@ public class FillEvent extends Event {
 		}
 		
 		return full_cost;
+	}
+
+	@Override
+	public String getOfType() {
+		return this.oftype;
 	}
 }

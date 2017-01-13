@@ -1,6 +1,6 @@
 
-public abstract class Event {
+public interface Event {
 	
-	String oftype;
+	public String getOfType();
 
 }

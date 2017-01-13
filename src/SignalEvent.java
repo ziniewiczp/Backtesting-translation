@@ -1,6 +1,7 @@
 
-public class SignalEvent extends Event {
+public class SignalEvent implements Event {
 	
+	String oftype;
 	String strategy_id;
 	String symbol;
 	String datetime;
@@ -15,5 +16,10 @@ public class SignalEvent extends Event {
 		this.datetime = datetime;
 		this.signal_type = signal_type;
 		this.strength = strength;
+	}
+	
+	@Override
+	public String getOfType() {
+		return this.oftype;
 	}
 }
