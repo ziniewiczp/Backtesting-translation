@@ -43,8 +43,8 @@ public class DatabaseDataHandler extends DataHandler {
 				// getting data from database
 				resultSet = dbStatement.executeQuery("SELECT dp.price_date, dp.open_price," + 
 													 "dp.high_price, dp.low_price, dp.close_price," + 
-													 "dp.volume, dp.adj_close_price FROM symbol AS sym" + 
-													 "INNER JOIN daily_price AS dp ON dp.symbol_id = sym.id" + 
+													 "dp.volume, dp.adj_close_price FROM symbol AS sym " + 
+													 "INNER JOIN daily_price AS dp ON dp.symbol_id = sym.id " + 
 													 "WHERE sym.ticker = \"" + symbol + "\" ORDER BY dp.price_date ASC;");
 				
 				// filling dataset ArrayList with data taken from database
