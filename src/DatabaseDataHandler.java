@@ -1,18 +1,34 @@
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Queue;
 import java.sql.*;
 
 
 public class DatabaseDataHandler extends DataHandler {
 
 	private int currentRow;
-	private String[] symbols = {"AAPL", "GOOG", "PEP"};
+	private String[] symbolList;
 	private ArrayList<DataRow> AAPLDataset;
 	private ArrayList<DataRow> GOOGDataset;
 	private ArrayList<DataRow> PEPDataset;
+	private Queue<Event> events;
+	private boolean continueBacktest;
 	
-	public DatabaseDataHandler() {
+	public DatabaseDataHandler(Queue<Event> events, String[] symbolList) {
+		
+		this.symbolList = symbolList;
+		this.events = events;
+		this.continueBacktest = true;
+		
 		open_convert_database();
+	}
+	
+	public boolean getContinueBacktest() {
+		return this.continueBacktest;
+	}
+	
+	public String[] getSymbolList() {
+		return this.symbolList;
 	}
 
 	/*
@@ -39,7 +55,7 @@ public class DatabaseDataHandler extends DataHandler {
 
 			dbStatement = dbConnection.createStatement();
 			
-			for( String symbol : symbols ) {
+			for( String symbol : symbolList ) {
 				// getting data from database
 				resultSet = dbStatement.executeQuery("SELECT dp.price_date, dp.open_price," + 
 													 "dp.high_price, dp.low_price, dp.close_price," + 
@@ -268,10 +284,19 @@ public class DatabaseDataHandler extends DataHandler {
 	}
 	
 	public void update_bars() {
-		for( String symbol : symbols ) {
+		for( String symbol : symbolList ) {
 			get_new_bar(symbol);
 		}
 		
-		this.currentRow++;
+		this.events.add(new MarketEvent());
+		
+		if(this.currentRow >= this.AAPLDataset.size() - 1 || this.currentRow >= this.GOOGDataset.size() - 1
+				|| this.currentRow >= this.PEPDataset.size() - 1) {
+			
+			this.continueBacktest = false;
+			
+		} else {
+			this.currentRow++;
+		}
 	}
 }

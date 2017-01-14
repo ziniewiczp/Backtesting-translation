@@ -2,15 +2,80 @@ import java.math.BigDecimal;
 
 public class FillEvent implements Event {
 	
-	String oftype;
-	String timeindex;
-	String symbol;
-	String exchange;
-	BigDecimal quantity;
-	String direction;
-	BigDecimal fill_cost;
-	BigDecimal commission;
+	private String oftype;
+	private String timeindex;
+	private String symbol;
+	private String exchange;
+	private BigDecimal quantity;
+	private String direction;
+	private BigDecimal fill_cost;
+	private BigDecimal commission;
 	
+	@Override
+	public String getOfType() {
+		return oftype;
+	}
+
+	public void setOftype(String oftype) {
+		this.oftype = oftype;
+	}
+
+	public String getTimeindex() {
+		return timeindex;
+	}
+
+	public void setTimeindex(String timeindex) {
+		this.timeindex = timeindex;
+	}
+
+	public String getSymbol() {
+		return symbol;
+	}
+
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
+	}
+
+	public String getExchange() {
+		return exchange;
+	}
+
+	public void setExchange(String exchange) {
+		this.exchange = exchange;
+	}
+
+	public BigDecimal getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(BigDecimal quantity) {
+		this.quantity = quantity;
+	}
+
+	public String getDirection() {
+		return direction;
+	}
+
+	public void setDirection(String direction) {
+		this.direction = direction;
+	}
+
+	public BigDecimal getFill_cost() {
+		return fill_cost;
+	}
+
+	public void setFill_cost(BigDecimal fill_cost) {
+		this.fill_cost = fill_cost;
+	}
+
+	public BigDecimal getCommission() {
+		return commission;
+	}
+
+	public void setCommission(BigDecimal commission) {
+		this.commission = commission;
+	}
+
 	// commission as an argument
 	public FillEvent(String timeindex, String symbol, String exchange, 
 			BigDecimal quantity, String direction, BigDecimal fill_cost, BigDecimal commission) {
@@ -54,10 +119,5 @@ public class FillEvent implements Event {
 		}
 		
 		return full_cost;
-	}
-
-	@Override
-	public String getOfType() {
-		return this.oftype;
 	}
 }
